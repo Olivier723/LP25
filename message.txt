@@ -1,0 +1,140 @@
+========================
+===== Analysis =========
+========================
+
+parse_dir: ok
+
+clear_recipient_list: une seule variable est nécessaire, la seconde pouvant être list.
+
+add_recipient_to_list: retourner NULL en cas d'erreur peut faire perdre la liste antérieure (fuite mémoire).  __DONE__
+
+extract_emails: préférer '\0' à 0 comme caractère nul. Le TODO n'est pas nécessaire : la copie par caractère évite
+une double lecture (une fois pour calculer la taille de n pour strncpy, une fois pour effectuer la copie).
+
+extract_e_mail: attention au cas où l'email serait suivi d'un caractère autre que l'espace.
+
+parse_file: condition good_params pourrait être directement dans le if.
+Le fichier n'est pas accédé dans un cadre de multiplexage, il pourrait être ouvert en tant que FILE* et lu
+avec getline ou fgets.
+Il faut boucle sur flock jusqu'à avoir l'accès au fichier. Sans cela, la fonction retournera sans avoir écrit
+le fichier.
+
+get_user_name_from_path: pour avoir le nom à partir du répertoire : c'est le basename du dossier à analyser.
+
+process_directory: ok
+
+process_file: ok
+
+========================
+==== Configuration =====
+========================
+
+make_configuration: pourquoi toutes les copies de chaînes de caractères d'optarg sont-elles en double ?
+// Problem with this FIX IT
+    if(is_verbose && !base_configuration->is_verbose){
+        base_configuration->is_verbose = is_verbose;
+    }
+La seconde partie de la condition est inutile (si is_verbose est true, base_configuration->is_verbose sera toujours true)
+
+skip_spaces: attention si str est NULL
+
+check_equal: attention à str==NULL; il ne faut pas de caractère != '=' dans la partie traitée, que des espaces, un = et des espaces.
+
+get_word: attention à source/target == NULL
+
+read_cfg_file: ok
+
+is_configuration_valid: on peut aussi tester les paramètres un par un et renvoyer false dès que l'un est invalide.
+
+========================
+===== direct_fork ======
+========================
+
+direct_fork_directories: peut être simplifié : si le nb de workers max est atteint, on attend, puis après on fork (on a à nouveau un slot
+libre pour un processus).
+
+direct_fork_files: good_params : cf + haut.
+même simplification possible que pour les directory.
+Le memset à la fin du while est inutile (fgets ajoute son '\0')
+
+========================
+==== fifo_processes ====
+========================
+
+make/erase_fifos: ok
+
+make_processes: dans l'enfant : il faut free pids, sinon chaque enfant va perdre la mémoire de la liste de PIDs copiée du parent.
+
+open_fifos: ok
+
+close_fifos: ok
+
+shutdown_processes: ok
+
+prepare_select: pas encore fait
+
+send_file_task: attention aux paramètres pointeurs NULL
+
+send_directory_task: attention aux paramètres pointeurs NULL
+
+oneIsFree/getFreeIndex: pas nécessairement utile, mais pourquoi pas. En revanche, un bool[] peut être représenté sous forme de plusieurs
+uintX_t (X pour la taille) avec autant de flags par uint que X.
+getFreeIndex va bloquer sur la première file et ralentir toute l'exécution. C'est pourquoi on utilise select.
+
+fifo_process_directory: remplacer getFreeIndex par une utilisation de select
+
+fifo_process_files: mêmes remarques que process_dir et l'utilisation de good_params.
+
+========================
+==== mq_processes ======
+========================
+
+make_message_queue: ok, il serait probablement plus judicieux d'utiliser le fichier exécutable comme nom de clé (le .c n'est pas nécessairement
+distribué avec le programme).
+
+close_message_queue: ok
+
+child_process: ok
+
+mq_make_processes: libérer my_children dans les enfants.
+
+close_processes: ne kill pas les enfants, mais leur envoie une task_t dont le callback est NULL.
+
+send_task_to_mq: ok
+
+send_file_task_to_mq: ok
+
+mq_process_directory: ok
+
+mq_process_files: pas encore fait.
+
+========================
+====== reducers ========
+========================
+
+add_source_to_list: pas encore fait
+
+clear_sources_list: pas encore fait
+
+find_source_in_list: pas encore fait
+
+add_recipient_to_source: pas encore fait
+
+files_list_reducer: struct dirent * ne doit pas être malloc'é, c'est readdir qui gère la structure.
+attention à la lecture/écriture en une fois, si le fichier est trop gros, ça ne fonctionnera pas.
+
+files_reducer: pas encore fait
+
+========================
+====== Utility =========
+========================
+
+concat_path: full_path doit être écrasé, il ne faut pas se préoccuper de son contenu initial.  __DONE__
+
+directory_exists: ok
+
+path_to_file_exists: il existe une fonction dirname pour extraire le chemin précédent le basename.  __DONE__
+
+sync_temporary_files: ok
+
+next_dir: avec une boucle plutôt que de la récursivité, ce serait mieux.  __DONE__

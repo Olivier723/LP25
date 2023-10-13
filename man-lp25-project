@@ -1,0 +1,34 @@
+.\" Manpage for lp25-project.
+.TH man 8 "01 Dec 2022" "1.0" "lp25-project man page"
+.SH NAME
+lp25-project \- program for sorting emails
+.SH SYNOPSIS
+.B lp25-project 
+[\fI\,OPTION\/\fR]... [\fI\,FILE\/\fR]... [\fI\,PATH\/\fR]...
+.SH DESCRIPTION
+.PP
+Analyzer of text files to extract data which is inspired by the functioning of a mapper/reducer whose principle is to alternate a phase of parallel treatments with a phase of sequential treatments. 
+.PP
+.TP
+\fB\-d\fR 
+Change data source directory
+.TP
+\fB\-o\fR 
+Change output file
+.TP
+\fB\-t\fR
+Change the temporary data directory path
+.TP
+\fB\-v\fR
+Run in verbose mode
+.TP
+\fB\-n\fR
+Set CPU Core Multiplier
+.TP
+\fB\-f\fR
+Change the path to the configuration file
+.SH BUGS
+MQ METHOD is working in progress
+FIFO and DIRECT FORK no known bugs
+.SH AUTHOR
+Written by Baptiste Cortier

@@ -1,0 +1,4 @@
+maildir/
+temp/*
+config.txt
+*.odt
